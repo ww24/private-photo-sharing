@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		{{> header}}
+	</head>
+	<body>
+		<h1>User Manager</h1>
+
+		<div>
+			{{#users}}
+			<div>
+				twitter: @{{screen_name}}<br>
+				twitter id: {{id}}
+			</div>
+			{{/users}}
+		</div>
+
+		<form id="add-user" method="post">
+			<input type="text" placeholder="screen name">
+			<input type="text" placeholder="id number">
+			<button type="submit">Add User</button>
+		</form>
+
+		{{> footer}}
+		<script>
+			$(function () {
+				var _token = "{{csrf_token}}";
+				$("#add-user").submit(function (e) {
+					e.preventDefault();
+
+					$.ajax({
+						method: "post",
+						dataType: "json",
+						data: $(this).serializeArray()
+					}).done(function (res) {
+						console.log(res);
+						// location.reload(true);
+					}).fail(function () {
+						alert("server error");
+					});
+				});
+			});
+		</script>
+	</body>
+</html>

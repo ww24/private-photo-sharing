@@ -1,0 +1,23 @@
+{
+  "name": "private-photo-sharing",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "prostart": "NODE_ENV=production npm start",
+    "dbstart": "mongod -f db/mongod.conf"
+  },
+  "dependencies": {
+    "body-parser": "^1.6.6",
+    "connect-flash": "^0.1.1",
+    "connect-mongo": "^0.4.1",
+    "express": "^4.8.5",
+    "express-session": "^1.7.6",
+    "hogan-express": "^0.5.2",
+    "hogan.js": "^3.0.2",
+    "mime-magic": "^5.14.0",
+    "mongoose": "^3.8.15",
+    "multer": "^0.1.4",
+    "passport": "^0.2.0",
+    "passport-twitter": "^1.0.2"
+  }
+}

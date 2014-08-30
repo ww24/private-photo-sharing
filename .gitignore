@@ -1,0 +1,19 @@
+# Node.js
+node_modules
+*.log
+
+# Photos
+public/photos/*
+temp/*
+
+# Git
+.*
+!.gitignore
+!.gitkeep
+
+# MongoDB
+db/*
+!db/mongod.conf
+
+# Settings
+config.json

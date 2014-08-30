@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		{{> header}}
+	</head>
+	<body>
+		<h1>Photo</h1>
+
+		<form method="post" enctype="multipart/form-data">
+			<input type="text" name="title" placeholder="タイトル">
+			<input type="file" name="photo" accept="image/*" multiple required>
+			<p>
+				<input type="submit" value="投稿">
+			</p>
+		</form>
+
+		{{> footer}}
+	</body>
+</html>

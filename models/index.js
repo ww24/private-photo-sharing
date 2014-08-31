@@ -4,7 +4,7 @@
  */
 
 var mongoose = require("mongoose"),
-    libs = require("../libs"),
+    loader = require("../libs/loader"),
     config = require("../config.json");
 
 var url = "mongodb://";
@@ -18,4 +18,4 @@ url += config.db.host + ":" + config.db.port + "/" + config.db.name;
 // create MongoDB connection
 mongoose.connect(url);
 
-module.exports = libs.loader(__dirname);
+module.exports = loader(__dirname);

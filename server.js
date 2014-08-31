@@ -24,7 +24,8 @@ app.set("view engine", "html");
 app.engine("html", hogan);
 app.locals.partials = {
   header: "partials/header",
-  footer: "partials/footer"
+  footer: "partials/footer",
+  modal: "partials/modal"
 };
 
 // middleware
@@ -93,6 +94,10 @@ if (app.get("env") === "development") {
         error: err
     });
   });
+} else {
+  process.on("uncaughtException", function (err) {
+    console.error(err);
+  });
 }
 
 // production error handler
@@ -108,10 +113,6 @@ app.use(function(err, req, res, next) {
     message: err.message,
     error: null
   });
-});
-
-process.on("uncaughtException", function (err) {
-  console.error(err);
 });
 
 // start server

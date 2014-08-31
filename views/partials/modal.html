@@ -1,0 +1,57 @@
+<!-- add Phone Number dialog -->
+<div v-component="add-photo-modal" id="add-photo-modal" class="modal fade" tabindex="-1" role="dialog" aria-labbeldby="addPhoto" aria-hidden="true">
+  <div class="modal-dialog">
+    <form v-on="submit: submit" class="modal-content" action="/photo?_csrf={{_csrf}}" method="post" enctype="multipart/form-data" role="form">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">
+          <span class="glyphicon glyphicon-plus"></span> Add your photo(s)
+        </h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label class="col-xs-3 control-label">写真</label>
+            <div class="col-xs-9">
+              <input class="form-control" type="file" name="photo" accept="image/jpeg" multiple required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-xs-3 control-label">共有ユーザ</label>
+            <div class="col-xs-9">
+              <div v-repeat="viewers" class="input-group">
+                <span class="input-group-addon">@</span>
+                <input class="form-control" type="text" name="viewers" value="[[value]]" required>
+                <span class="input-group-btn">
+                  <button v-on="click: remove($index)" v-show="$index > 0" class="btn btn-default" type="button">
+                    <span class="glyphicon glyphicon-minus"></span>
+                  </button>
+                  <button v-on="click: add" class="btn btn-default" type="button">
+                    <span class="glyphicon glyphicon-plus"></span>
+                  </button>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div v-show="error_message.length > 0" id="add-phone-modal-error" class="alert alert-danger">
+            [[error_message]]
+          </div>
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              Tips
+            </div>
+            <div class="panel-body">
+              共有ユーザ以外には公開されません。<br>
+              共有ユーザに指定した場合でも、ログイン権限が無いユーザからは閲覧できません。<br>
+              他のユーザにログイン権限を与えたい場合は <a href="https://twitter.com/ww24">@ww24</a> までお問い合わせください。
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button id="add-phone-modal-submit" data-loading-text="Saving..." type="submit" class="btn btn-primary">Add</button>
+      </div>
+    </form>
+  </div>
+</div>

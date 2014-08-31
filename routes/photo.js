@@ -108,22 +108,45 @@ function saveFile(file, callback) {
 router.post("/", multer({dest: temp_dir}));
 router.post("/", function (req, res) {
   var photo = req.files.photo;
+  var data = req.body;
 
   if (! photo) {
-    return res.status(400).send("Bad Request");
+    return res.status(400).send({
+      status: "ng",
+      error: "Bad Request"
+    });
   }
 
-  if (photo instanceof Array) {
-    photo.forEach(function (file, index) {
-      saveFile.call(req, file, function () {
-        index || res.send("ok");
-      });
-    });
-  } else {
-    saveFile.call(req, photo, function () {
-      res.send("ok");
-    });
+  if (! (data.viewers instanceof Array)) {
+    data.viewers = [data.viewers];
   }
+
+  libs.twitter.screenNameToId({
+    key: req.user.key,
+    secret: req.user.secret
+  }, data.viewers, function (err, ids) {
+    if (err) {
+      res.status(500).json({
+        status: "ng",
+        error: "twitter access error"
+      });
+      return console.error(err);
+    }
+
+    data.viewers = ids;
+
+    if (photo instanceof Array) {
+      photo.forEach(function (file, index) {
+        saveFile.call(req, file, function () {
+          ! index || res.json({status: "ok"});
+        });
+      });
+    } else {
+      saveFile.call(req, photo, function () {
+        res.json({status: "ok"});
+      });
+    }
+  });
 });
 
 // update photo data
@@ -133,20 +156,36 @@ router.put("/:id", function (req, res) {
     return res.status(400).send("Bad Request");
   }
 
-  models.Photo.findOne({id: req.params.id}).populate("contributor").exec(function (err, photo) {
-    if (req.user.id !== photo.contributor.id) {
-      return res.status(403).send("Forbidden");
+  if (! (data.viewers instanceof Array)) {
+    data.viewers = [data.viewers];
+  }
+
+  libs.twitter.screenNameToId({
+    key: req.user.key,
+    secret: req.user.secret
+  }, data.viewers, function (err, ids) {
+    if (err) {
+      res.status(500).send("twitter access error");
+      return console.error(err);
     }
 
-    data.name && (photo.name = data.name);
-    data.viewers && (photo.viewers = data.name);
-    photo.save(function (err) {
-      if (err) {
-        res.status(500).send("remove error");
-        return console.error(err);
+    data.viewers = ids;
+
+    models.Photo.findOne({id: req.params.id}).populate("contributor").exec(function (err, photo) {
+      if (req.user.id !== photo.contributor.id) {
+        return res.status(403).send("Forbidden");
       }
 
-      res.send("ok");
+      data.name && (photo.name = data.name);
+      data.viewers && (photo.viewers = data.viewers);
+      photo.save(function (err) {
+        if (err) {
+          res.status(500).send("remove error");
+          return console.error(err);
+        }
+
+        res.send("ok");
+      });
     });
   });
 });

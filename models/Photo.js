@@ -15,14 +15,17 @@ var schema = new mongoose.Schema({
     type: String,
     required: true
   },
-  provider: {
+  size: {
+    type: Number,
+    required: true
+  },
+  contributor: {
     type: mongoose.Schema.ObjectId,
     ref: "User",
     required: true
   },
-  viewer: {
-    type: [mongoose.Schema.ObjectId],
-    ref: "User"
+  viewers: {
+    type: [Number]
   },
   exif: {
     type: Object
@@ -37,6 +40,11 @@ var schema = new mongoose.Schema({
     default: Date.now,
     required: true
   }
+});
+
+schema.pre("save", function (next) {
+  this.updated_at = Date.now();
+  next();
 });
 
 module.exports = mongoose.model("Photo", schema);

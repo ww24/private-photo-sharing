@@ -5,6 +5,8 @@
 var express = require("express"),
     bodyParser = require("body-parser"),
     session = require("express-session"),
+    csrf = require("csurf"),
+    morgan = require("morgan"),
     MongoStore = require("connect-mongo")(session),
     flash = require("connect-flash"),
     hogan = require("hogan-express"),
@@ -40,6 +42,16 @@ app.use(session({
   secret: config.session.secret
 }));
 app.use(flash());
+app.use(csrf());
+app.use(function (req, res, next) {
+  res.locals._csrf = req.csrfToken();
+  next();
+});
+
+// logger
+if (app.get("env") === "development") {
+  app.use(morgan());
+}
 
 // passport settings
 app.use(passport.initialize());
@@ -52,18 +64,29 @@ app.use(function (req, res, next) {
 // load routes
 routes.call(app);
 
-/// catch 404
+// catch 404
 app.use(function(req, res) {
   console.error(404, req.url);
   res.send("Not Found", 404);
 });
 
-/// error handlers
+// catch csrf token error
+app.use(function (err, req, res, next) {
+  if (err.code !== "EBADCSRFTOKEN") {
+    return next(err);
+  }
+
+  // handle CSRF token errors here
+  res.status(403);
+  res.send("session has expired or form tampered with");
+});
+
+// error handlers
 
 // development error handler
 // will print stacktrace
 if (app.get("env") === "development") {
-  app.use(function(err, req, res) {
+  app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.render("error", {
         message: err.message,
@@ -74,7 +97,7 @@ if (app.get("env") === "development") {
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res) {
+app.use(function(err, req, res, next) {
   res.status(err.status || 500);
 
   if (err.message === "account-unavailable") {

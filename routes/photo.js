@@ -126,7 +126,7 @@ router.post("/", function (req, res) {
     secret: req.user.secret
   }, data.viewers, function (err, ids) {
     if (err) {
-      res.status(500).json({
+      res.status(err.statusCode).json({
         status: "ng",
         error: "twitter access error"
       });
@@ -165,7 +165,10 @@ router.put("/:id", function (req, res) {
     secret: req.user.secret
   }, data.viewers, function (err, ids) {
     if (err) {
-      res.status(500).send("twitter access error");
+      res.status(err.statusCode).json({
+        status: "ng",
+        error: "twitter access error"
+      });
       return console.error(err);
     }
 

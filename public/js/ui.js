@@ -19,7 +19,10 @@ Vue.component("add-photo-modal", Vue.extend({
       e.preventDefault();
 
       var that = this;
+      this.error_message = "";
+
       var $e = $(e.target);
+      var $button = $("#add-photo-modal-submit").button("loading");
 
       $.ajax({
         method: $e.attr("method"),
@@ -29,10 +32,24 @@ Vue.component("add-photo-modal", Vue.extend({
         data: new FormData(e.target),
         dataType: "json"
       }).done(function (res) {
-        console.log(res);
+        if (res && res.status === "ok") {
+          // close modal
+          $(that.$el).modal("hide");
+          // reset form
+          that.viewers = [{value: ""}];
+          e.target.reset();
+        } else {
+          that.error_message = "server error";
+        }
       }).fail(function (req) {
         console.error(req);
-        that.error_message = "network error";
+        if (req.status === 404) {
+          that.error_message = "screen name が見つかりません。";
+        } else {
+          that.error_message = "network error";
+        }
+      }).always(function () {
+        $button.button("reset");
       });
     }
   }

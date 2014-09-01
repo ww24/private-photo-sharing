@@ -4,11 +4,109 @@
 		{{> header}}
 	</head>
 	<body>
-		<h1>Home</h1>
+		<div class="wrap">
+			<!-- Fixed navbar -->
+			<header class="navbar navbar-default navbar-fixed-top">
+				<div class="container">
+					<!-- menu -->
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<a class="navbar-brand" href="/home">Private Photo Sharing</a>
+					</div>
+					<div class="navbar-collapse collapse">
+						<ul class="nav navbar-nav navbar-right">
+							<li>
+								<a data-toggle="modal" href="#add-photo-modal">
+									<span class="glyphicon glyphicon-plus"></span> Add Photo
+								</a>
+							</li>
+							<li>
+								<a href="/logout">
+									<span class="glyphicon glyphicon-off"></span>
+									Logout
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</header>
 
-		<button type="button" class="btn btn-danger btn-xs" data-toggle="modal" href="#add-photo-modal">
-			<span class="glyphicon glyphicon-warning-sign"></span> Add Photo
-		</button>
+			<!-- content -->
+			<div v-component="photo-stream" class="container">
+				<div class="page-header no-bottom-border">
+					<div class="media">
+						{{#user}}
+						<div class="pull-left">
+							<img src="{{icon_url}}" alt="icon" class="media-object">
+						</div>
+						<div class="media-body">
+							<h4 class="media-heading">@{{screen_name}}</h4>
+							{{name}}
+						</div>
+						{{/user}}
+					</div>
+
+					<!-- Nav tabs -->
+					<ul class="nav nav-tabs nav-tabs-right" role="tablist">
+						<li class="active">
+							<a href="#my-photos" role="tab" data-toggle="tab">My Photos</a>
+						</li>
+						<li>
+							<a href="#photos" role="tab" data-toggle="tab">Other Photos</a>
+						</li>
+					</ul>
+				</div>
+
+				<!-- Tab panes -->
+				<div class="tab-content">
+					<div id="my-photos" class="tab-pane active">
+						<p>
+							<button v-on="click: refresh" class="btn btn-sm btn-default">
+								<span class="glyphicon glyphicon-refresh"></span> Refresh
+							</button>
+							あなたが投稿した写真一覧
+						</p>
+						<div class="row">
+							<div v-repeat="my_photos" class="col-sm-6 col-md-4">
+								<div class="thumbnail">
+									<img v-attr="src: '/photos/'+id+'.jpg'" alt="photo">
+									<div class="caption">
+										<h3>[[name]]</h3>
+										<p>
+											共有ユーザ:
+											<span v-repeat="viewer">[[.]]</span> 
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="photos" class="tab-pane">
+						<p>
+							<button v-on="click: refresh" class="btn btn-sm btn-default">
+								<span class="glyphicon glyphicon-refresh"></span> Refresh
+							</button>
+							他のユーザが投稿した写真一覧
+						</p>
+						<div class="row">
+							<div v-repeat="photos" class="col-sm-6 col-md-4">
+								<div class="thumbnail">
+									<img v-attr="src: '/photos/'+id+'.jpg'" alt="photo">
+									<div class="caption">
+										<h3>[[name]]</h3>
+										<p>投稿者: @[[contributor.screen_name]]</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
 		{{> modal}}
 		{{> footer}}

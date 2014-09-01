@@ -13,7 +13,9 @@ var express = require("express"),
     models = require("../models");
 
 router.get("/", function (req, res) {
-  models.Photo.find({contributor: req.user}, function (err, my_photos) {
+  models.Photo.find({contributor: req.user})
+  .sort({created_at: -1})
+  .exec(function (err, my_photos) {
     if (err) {
       return res.status(500).json({
         status: "ng",
@@ -21,7 +23,10 @@ router.get("/", function (req, res) {
       });
     }
 
-    models.Photo.find({viewers: req.user.id}, function (err, photos) {
+    models.Photo.find({viewers: req.user.id})
+    .sort({created_at: -1})
+    .populate("contributor")
+    .exec(function (err, photos) {
       if (err) {
         return res.status(500).json({
           status: "ng",

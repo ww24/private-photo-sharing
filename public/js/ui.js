@@ -55,6 +55,34 @@ Vue.component("add-photo-modal", Vue.extend({
   }
 }));
 
+Vue.component("photo-stream", Vue.extend({
+  data: {
+    my_photos: [],
+    photos: []
+  },
+  ready: function () {
+    var that = this;
+
+    $.getJSON("/photo", function (data) {
+      that.my_photos = data.my_photos;
+      that.photos = data.photos;
+    });
+  },
+  methods: {
+    refresh: function (e) {
+      var that = this;
+
+      var $e = $(e.target).button("loading");
+
+      $.getJSON("/photo", function (data) {
+        that.my_photos = data.my_photos;
+        that.photos = data.photos;
+        $e.button("reset");
+      });
+    }
+  }
+}));
+
 Vue.config({delimiters: ["[", "]"]});
 new Vue({
   el: document.body

@@ -1,0 +1,10 @@
+{
+  "apps": [{
+    "name": "pps",
+    "script": "server.js",
+    "env": {
+      "NODE_ENV": "production"
+    },
+    "instances": 1
+  }]
+}

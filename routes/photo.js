@@ -45,6 +45,7 @@ router.get("/", function (req, res) {
 // upload dir
 var temp_dir = path.resolve(__dirname, "../temp");
 var photo_dir = path.resolve(__dirname, "../public/photos");
+var thumbs_dir = path.resolve(__dirname, "../public/thumbs");
 
 // cleanup temp dir
 fs.readdirSync(temp_dir).forEach(function (filename) {
@@ -55,6 +56,7 @@ fs.readdirSync(temp_dir).forEach(function (filename) {
   fs.unlinkSync(path.join(temp_dir, filename));
 });
 
+// 写真の削除
 function unlinkFile(filename) {
   fs.unlink(filename, function (err) {
     if (err) {
@@ -62,47 +64,72 @@ function unlinkFile(filename) {
     }
   });
 }
+// 写真の保存
 function saveFile(file, callback) {
   var req = this;
 
-  mime(file.path, function (err, type) {
-    if (err) {
-      return callback(err);
-    }
-    if (type !== "image/jpeg") {
-      unlinkFile(file.path);
-      return callback(new Error("invalid mime type"));
-    }
+  libs.genid(function (err, id) {
+    // id の存在確認
+    models.Photo.findOne({id: id}, function (err, photo) {
+      if (err) {
+        unlinkFile(file.path);
+        return callback(err);
+      }
 
-    libs.genid(function (err, id) {
-      models.Photo.findOne({id: id}, function (err, photo) {
+      // id が既に使われている場合は再度 id 生成
+      if (photo !== null) {
+        return saveFile.call(req, file, callback);
+      }
+
+      // JPEG 確認
+      mime(file.path, function (err, type) {
         if (err) {
           unlinkFile(file.path);
           return callback(err);
         }
-        if (photo !== null) {
-          return saveFile.call(req, file, callback);
+
+        // JPEG 以外の場合はエラー
+        if (type !== "image/jpeg") {
+          unlinkFile(file.path);
+          return callback(new Error("invalid mime type"));
         }
 
+        // EXIF Data の取得
         im.readMetadata(file.path, function (err, metadata) {
           if (err) {
-            return callback(err);
+            console.error(err);
           }
 
-          var photo = new models.Photo({
+          // DB へ保存
+          models.Photo.create({
             id: id,
             name: file.originalname,
             size: file.size,
             contributor: req.user,
             viewers: req.body.viewers,
             exif: metadata && metadata.exif
-          });
-          photo.save(function (err) {
+          }, function (err) {
             if (err) {
               console.error(err);
             }
           });
-          fs.rename(file.path, path.join(photo_dir, id + ".jpg"), callback);
+
+          // thumbnail の生成
+          im.resize({
+            srcPath: file.path,
+            dstPath: path.join(thumbs_dir, id + ".jpg"),
+            quality: 0.8,
+            format: "jpg",
+            progressive: true,
+            width: 480
+          }, function (err, stdout, stderr) {
+            if (err) {
+              console.error(err, stderr);
+            }
+
+            // photo dir へ移動
+            fs.rename(file.path, path.join(photo_dir, id + ".jpg"), callback);
+          });
         });
       });
     });
@@ -212,6 +239,7 @@ router.delete("/:id", function (req, res) {
       }
 
       unlinkFile(path.join(photo_dir, req.params.id + ".jpg"));
+      unlinkFile(path.join(thumbs_dir, req.params.id + ".jpg"));
       res.send("ok");
     });
   });

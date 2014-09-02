@@ -73,12 +73,12 @@
 						<div class="row">
 							<div v-repeat="my_photos" class="col-sm-6 col-md-4">
 								<div class="thumbnail">
-									<img v-attr="src: '/photos/'+id+'.jpg'" alt="photo">
+									<div v-style="background-image: 'url(/thumbs/[[id]].jpg)'" class="image"></div>
 									<div class="caption">
 										<h3>[[name]]</h3>
 										<p>
 											共有ユーザ:
-											<span v-repeat="viewer">[[.]]</span> 
+											<span v-repeat="viewers">[[$value]] </span>
 										</p>
 									</div>
 								</div>
@@ -95,7 +95,7 @@
 						<div class="row">
 							<div v-repeat="photos" class="col-sm-6 col-md-4">
 								<div class="thumbnail">
-									<img v-attr="src: '/photos/'+id+'.jpg'" alt="photo">
+									<div v-style="background-image: 'url(/thumbs/[[id]].jpg)'" class="image"></div>
 									<div class="caption">
 										<h3>[[name]]</h3>
 										<p>投稿者: @[[contributor.screen_name]]</p>

@@ -131,3 +131,23 @@
     margin-top: -24px;
   }
 }
+
+/* thumbnail style */
+.thumbnail .image {
+  height: 200px;
+  width: 100%;
+  background-size: cover;
+  background-position: center center;
+}
+.thumbnail .caption h3 {
+  margin: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.thumbnail .caption p {
+  margin: 10px 0 0 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}

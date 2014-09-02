@@ -4,6 +4,7 @@ node_modules
 
 # Photos
 public/photos/*
+public/thumbs/*
 temp/*
 
 # Git

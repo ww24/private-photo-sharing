@@ -143,7 +143,7 @@ router.post("/", function (req, res) {
   var data = req.body;
 
   if (! photo) {
-    return res.status(400).send({
+    return res.status(400).json({
       status: "ng",
       error: "Bad Request"
     });
@@ -185,7 +185,10 @@ router.post("/", function (req, res) {
 router.put("/:id", function (req, res) {
   var data = req.body;
   if (! data.name && ! data.viewers) {
-    return res.status(400).send("Bad Request");
+    return res.status(400).json({
+      status: "ng",
+      error: "Bad Request"
+    });
   }
 
   if (! (data.viewers instanceof Array)) {
@@ -208,18 +211,26 @@ router.put("/:id", function (req, res) {
 
     models.Photo.findOne({id: req.params.id}).populate("contributor").exec(function (err, photo) {
       if (req.user.id !== photo.contributor.id) {
-        return res.status(403).send("Forbidden");
+        return res.status(403).json({
+          status: "ng",
+          error: "Forbidden"
+        });
       }
 
       data.name && (photo.name = data.name);
       data.viewers && (photo.viewers = data.viewers);
       photo.save(function (err) {
         if (err) {
-          res.status(500).send("remove error");
+          res.status(500).json({
+            status: "ng",
+            error: "remove error"
+          });
           return console.error(err);
         }
 
-        res.send("ok");
+        res.json({
+          status: "ok"
+        });
       });
     });
   });
@@ -229,18 +240,26 @@ router.put("/:id", function (req, res) {
 router.delete("/:id", function (req, res) {
   models.Photo.findOne({id: req.params.id}).populate("contributor").exec(function (err, photo) {
     if (req.user.id !== photo.contributor.id) {
-      return res.status(403).send("Forbidden");
+      return res.status(403).json({
+        status: "ng",
+        error: "Forbidden"
+      });
     }
 
     photo.remove(function (err) {
       if (err) {
-        res.status(500).send("remove error");
+        res.status(500).json({
+          status: "ng",
+          error: "remove error"
+        });
         return console.error(err);
       }
 
       unlinkFile(path.join(photo_dir, req.params.id + ".jpg"));
       unlinkFile(path.join(thumbs_dir, req.params.id + ".jpg"));
-      res.send("ok");
+      res.json({
+        status: "ok"
+      });
     });
   });
 });

@@ -3,87 +3,159 @@
  * Private Photo Sharing
  */
 
-Vue.component("add-photo-modal", Vue.extend({
-  data: {
-    viewers: [{value: ""}],
-    error_message: ""
-  },
-  methods: {
-    add: function () {
-      this.viewers.push({value: ""});
-    },
-    remove: function (index) {
-      this.viewers.splice(index, 1);
-    },
-    submit: function (e) {
-      e.preventDefault();
-
-      var that = this;
-      this.error_message = "";
-
-      var $e = $(e.target);
-      var $button = $("#add-photo-modal-submit").button("loading");
-
-      $.ajax({
-        method: $e.attr("method"),
-        url: $e.attr("action"),
-        processData: false,
-        contentType: false,
-        data: new FormData(e.target),
-        dataType: "json"
-      }).done(function (res) {
-        if (res && res.status === "ok") {
-          // close modal
-          $(that.$el).modal("hide");
-          // reset form
-          that.viewers = [{value: ""}];
-          e.target.reset();
-        } else {
-          that.error_message = "server error";
-        }
-      }).fail(function (req) {
-        console.error(req);
-        if (req.status === 404) {
-          that.error_message = "screen name が見つかりません。";
-        } else {
-          that.error_message = "network error";
-        }
-      }).always(function () {
-        $button.button("reset");
-      });
-    }
-  }
-}));
-
-Vue.component("photo-stream", Vue.extend({
-  data: {
-    my_photos: [],
-    photos: []
-  },
-  ready: function () {
-    var that = this;
-
-    $.getJSON("/photo", function (data) {
-      that.my_photos = data.my_photos;
-      that.photos = data.photos;
-    });
-  },
-  methods: {
-    refresh: function (e) {
-      var that = this;
-
-      var $e = $(e.target).button("loading");
-
-      $.getJSON("/photo", function (data) {
-        that.my_photos = data.my_photos;
-        that.photos = data.photos;
-        $e.button("reset");
-      });
-    }
-  }
-}));
-
-Vue.config({delimiters: ["[", "]"]});
-new Vue({
-  el: document.body
+Vue.config({
+  delimiters: ["[", "]"]
 });
+
+(function () {
+  var photoViewModel = Vue.extend({
+    data: {
+      viewers: [{value: ""}],
+      error_message: ""
+    },
+    methods: {
+      add: function () {
+        this.viewers.push({value: ""});
+      },
+      remove: function (index) {
+        this.viewers.splice(index, 1);
+      },
+      submit: function (e) {
+        e.preventDefault();
+
+        var that = this;
+        this.error_message = "";
+
+        var $e = $(e.target);
+        var $button = $("button.submit-button").button("loading");
+
+        var options = {
+          method: $e.attr("method"),
+          url: $e.attr("action"),
+          data: $e.serialize(),
+          dataType: "json"
+        };
+
+        // for multipart/form-data
+        if (options.method === "post") {
+          options.processData = false;
+          options.contentType = false;
+          options.data = new FormData(e.target);
+        }
+
+        $.ajax(options).done(function (res) {
+          if (res && res.status === "ok") {
+            // close modal
+            $(that.$el).modal("hide");
+            // reset form
+            that.viewers = [{value: ""}];
+            e.target.reset();
+            that.$root.$broadcast("refresh");
+          } else {
+            that.error_message = "server error";
+          }
+        }).fail(function (req) {
+          console.error(req);
+          if (req.status === 404) {
+            that.error_message = "screen name が見つかりません。";
+          } else {
+            that.error_message = "network error";
+          }
+        }).always(function () {
+          $button.button("reset");
+        });
+      },
+      delete: function (e) {
+        e.preventDefault();
+
+        var that = this;
+
+        if (! confirm("写真を削除しますか？\nこの操作は取り消しできません。")) {
+          return;
+        }
+
+        var $form = $(this.$el).find("form");
+        var $delete = $("#add-photo-modal-delete").button("loading");
+        var _csrf = $form.attr("action").split("_csrf=")[1];
+        var id = this.$root.$data.photo_detail.id;
+
+        $.ajax({
+          method: "delete",
+          url: "/photo/" + id,
+          data: {
+            _csrf: _csrf
+          },
+          dataType: "json"
+        }).done(function (res) {
+          if (res && res.status === "ok") {
+            // close modal
+            $(that.$el).modal("hide");
+            that.$root.$broadcast("refresh");
+          } else {
+            that.error_message = "server error";
+          }
+        }).fail(function (req) {
+          console.error(req);
+          that.error_message = "network error";
+        }).always(function () {
+          $delete.button("reset");
+        });
+      },
+      open: function () {
+        console.log(this.$data, this.$root.$data);
+        var file = "/photos/" + this.$root.$data.photo_detail.id + ".jpg";
+        open(file);
+      },
+      checkPermission: function () {
+        var data = this.$root.$data;
+        return ! (data.photo_detail.contributor && data.photo_detail.contributor.id);
+      }
+    }
+  });
+
+  Vue.component("add-photo-modal", photoViewModel);
+
+  Vue.component("photo-stream", Vue.extend({
+    data: {
+      my_photos: [],
+      photos: []
+    },
+    ready: function () {
+      var that = this;
+      var $refresh = $(this.$el).find("button.refresh");
+
+      this.$on("refresh", function () {
+        $refresh.button("loading");
+
+        $.getJSON("/photo", function (data) {
+          that.$data.my_photos = data.my_photos;
+          that.$data.photos = data.photos;
+          $refresh.button("reset");
+        });
+      });
+
+      this.$emit("refresh");
+    },
+    methods: {
+      refresh: function () {
+        this.$emit("refresh");
+      },
+      open: function (type, index) {
+        var photo = this[type][index];
+
+        this.$root.$data.photo_detail = photo;
+
+        $("#photo-detail-modal").modal("show");
+      }
+    }
+  }));
+
+  Vue.component("photo-detail-modal", photoViewModel);
+
+  new Vue({
+    el: document.body,
+    data: {
+      photo_detail: {}
+    }
+  });
+})();

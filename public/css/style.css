@@ -133,6 +133,9 @@
 }
 
 /* thumbnail style */
+.thumbnail-link {
+  cursor: pointer;
+}
 .thumbnail .image {
   height: 200px;
   width: 100%;
@@ -150,4 +153,12 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+}
+
+/* form-group style */
+.form-group p {
+  margin: 0;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }

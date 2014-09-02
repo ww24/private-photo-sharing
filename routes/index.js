@@ -10,7 +10,7 @@ module.exports = function () {
 
   app.use("/home", function (req, res, next) {
     if (! req.user) {
-      return res.status(403).send("Forbidden");
+      return res.redirect(302, "/auth");
     }
     next();
   });

@@ -96,7 +96,7 @@
             <div class="col-xs-9">
               <div v-repeat="viewers" class="input-group">
                 <span class="input-group-addon">@</span>
-                <input v-attr="value: $value" class="form-control" type="text" name="viewers" required>
+                <input class="form-control" type="text" name="viewers" value="[[value]]" required>
                 <span class="input-group-btn">
                   <button v-on="click: remove($index)" v-show="$index > 0" class="btn btn-default" type="button">
                     <span class="glyphicon glyphicon-minus"></span>

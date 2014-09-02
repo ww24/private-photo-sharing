@@ -156,7 +156,12 @@ Vue.config({
       open: function (type, index) {
         var photo = this[type][index];
 
-        this.$root.$data.photo_detail = photo;
+        // send data for photo-detail-modal
+        var root = this.$root.$data;
+        root.photo_detail = JSON.parse(JSON.stringify(photo));
+        root.photo_detail.viewers = root.photo_detail.viewers.map(function (value) {
+          return {value: value};
+        });
 
         $("#photo-detail-modal").modal("show");
       },

@@ -22,7 +22,7 @@ passport.use(new TwitterStrategy(config.twitter, function (key, secret, profile,
     id: profile._json.id,
     name: profile._json.name,
     screen_name: profile._json.screen_name,
-    icon_url: profile._json.profile_image_url,
+    icon_url: profile._json.profile_image_url_https,
     key: key,
     secret: secret
   };

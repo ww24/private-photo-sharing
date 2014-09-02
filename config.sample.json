@@ -3,6 +3,13 @@
     "port": 3000
   },
   "session": {
+    "name": "connect.sid",
+    "cookie": {
+      "path": "/",
+      "httpOnly": true,
+      "secure": false,
+      "maxAge": null
+    },
     "secret": "secret"
   },
   "db": {

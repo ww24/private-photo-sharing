@@ -33,14 +33,16 @@ app.use(express.static(path.resolve(__dirname, "public")));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(session({
+  name: config.session.name,
+  cookie: config.session.cookie,
+  secret: config.session.secret,
   store: new MongoStore({
     db: config.db.name,
     host: config.db.host,
     port: config.db.port,
     username: config.db.user,
     password: config.db.pass
-  }),
-  secret: config.session.secret
+  })
 }));
 app.use(flash());
 app.use(csrf());

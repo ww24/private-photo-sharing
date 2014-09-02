@@ -19,7 +19,7 @@ router.get("/", function (req, res) {
     if (err) {
       return res.status(500).json({
         status: "ng",
-        errors: ["DB error"]
+        error: "DB error"
       });
     }
 
@@ -30,7 +30,7 @@ router.get("/", function (req, res) {
       if (err) {
         return res.status(500).json({
           status: "ng",
-          errors: ["DB error"]
+          error: "DB error"
         });
       }
 

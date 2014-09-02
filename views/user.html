@@ -15,27 +15,29 @@
 			{{/users}}
 		</div>
 
-		<form id="add-user" method="post">
-			<input type="text" placeholder="screen name">
-			<input type="text" placeholder="id number">
+		<form id="add-user" method="post" action="/user?_csrf={{_csrf}}">
+			<input type="text" name="screen_name" placeholder="screen name" required>
 			<button type="submit">Add User</button>
 		</form>
 
 		{{> footer}}
 		<script>
 			$(function () {
-				var _token = "{{csrf_token}}";
 				$("#add-user").submit(function (e) {
 					e.preventDefault();
 
+					var $form = $(this);
+
 					$.ajax({
-						method: "post",
+						method: $form.attr("method"),
+						url: $form.attr("action"),
 						dataType: "json",
-						data: $(this).serializeArray()
+						data: $form.serialize()
 					}).done(function (res) {
 						console.log(res);
-						// location.reload(true);
-					}).fail(function () {
+						location.reload(true);
+					}).fail(function (req) {
+						console.error(req);
 						alert("server error");
 					});
 				});

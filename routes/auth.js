@@ -14,7 +14,7 @@ passport.serializeUser(function (user, done) {
   done(null, user.id);
 });
 passport.deserializeUser(function (id, done) {
-  models.User.findOne(id, done);
+  models.User.findOne({id: id}, done);
 });
 
 passport.use(new TwitterStrategy(config.twitter, function (key, secret, profile, done) {

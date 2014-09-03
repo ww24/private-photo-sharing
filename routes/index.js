@@ -6,6 +6,10 @@ var libs = require("../libs"),
 module.exports = function () {
   var app = this;
 
+  app.get("/", function (req, res) {
+    res.locals.template = "index";
+    res.render(res.locals.template);
+  });
   app.use("/", routes.auth);
 
   app.use("/home", function (req, res, next) {

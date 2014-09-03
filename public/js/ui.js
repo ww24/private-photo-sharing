@@ -8,13 +8,6 @@ Vue.config({
 });
 
 (function () {
-  function download(url, filename) {
-    var a = document.createElement("a");
-    a.href = url;
-    a.download = filename || url.split("/").slice(-1)[0];
-    a.click();
-  }
-
   var photoViewModel = Vue.extend({
     data: {
       viewers: [{value: ""}],
@@ -113,12 +106,6 @@ Vue.config({
         // open new tab
         open(file);
       },
-      download: function () {
-        var file = "/photos/" + this.$root.$data.photo_detail.id + ".jpg";
-        var name = this.$root.$data.photo_detail.name;
-        // download image file
-        download(file, name);
-      },
       checkPermission: function () {
         var data = this.$root.$data;
         return ! (data.photo_detail.contributor && data.photo_detail.contributor.id);
@@ -164,13 +151,6 @@ Vue.config({
         });
 
         $("#photo-detail-modal").modal("show");
-      },
-      download: function (index) {
-        var photo = this.photos[index];
-        var file = "/photos/" + photo.id + ".jpg";
-        var name = photo.name;
-        // download image file
-        download(file, name);
       }
     }
   }));

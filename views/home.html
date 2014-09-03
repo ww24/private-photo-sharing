@@ -100,9 +100,9 @@
 										<h3>[[name]]</h3>
 										<p>投稿者: @[[contributor.screen_name]]</p>
 										<div class="text-right">
-											<button v-on="click: download($index), click: stopEvent" class="btn btn-success" type="button">
+											<a v-on="click: stopEvent" class="btn btn-success" type="button" download="[[name]]" href="/photos/[[id]].jpg">
 												<span class="glyphicon glyphicon-download"></span> ダウンロード
-											</button>
+											</a>
 										</div>
 									</div>
 								</div>

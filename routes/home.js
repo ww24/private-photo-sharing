@@ -7,7 +7,7 @@ var express = require("express"),
 
 router.get("/", function (req, res) {
   res.locals.template = "home";
-
+  res.locals.title = "Home | ";
   res.render(res.locals.template);
 });
 

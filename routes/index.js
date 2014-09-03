@@ -8,6 +8,7 @@ module.exports = function () {
 
   app.get("/", function (req, res) {
     res.locals.template = "index";
+    res.locals.title = "";
     res.render(res.locals.template);
   });
   app.use("/", routes.auth);

@@ -10,6 +10,7 @@ var express = require("express"),
 router.get("/", function (req, res) {
   res.locals.users = [];
   res.locals.template = "user";
+  res.locals.title = "UserManager | ";
 
   models.User.find(function (err, users) {
     if (err) {

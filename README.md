@@ -10,14 +10,23 @@ Requirements
 * Node.js 0.10
 * MongoDB 2.6
 
+Setup
+-----
+1. `npm install`
+1. start mongod process
+
 Start
 -----
 ```
 npm start
 ```
 
-Stop
-----
+or
+
 ```
-npm stop
+pm2 start processes.json
 ```
+
+License
+-------
+[MIT](LICENSE)

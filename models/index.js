@@ -5,7 +5,7 @@
 
 var mongoose = require("mongoose"),
     loader = require("../libs/loader"),
-    config = require("../config.json");
+    config = require("config");
 
 var url = "mongodb://";
 

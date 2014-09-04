@@ -1,7 +1,7 @@
 
 var libs = require("../libs"),
     routes = libs.loader(__dirname),
-    config = require("../config.json");
+    config = require("config");
 
 module.exports = function () {
   var app = this;

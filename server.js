@@ -13,7 +13,7 @@ var express = require("express"),
     passport = require("passport"),
     path = require("path"),
     routes = require("./routes"),
-    config = require("./config.json");
+    config = require("config");
 
 var app = express();
 

@@ -7,7 +7,7 @@ var express = require("express"),
     passport = require("passport"),
     TwitterStrategy = require("passport-twitter").Strategy,
     models = require("../models"),
-    config = require("../config.json");
+    config = require("config");
 
 // initialize authenticate
 passport.serializeUser(function (user, done) {

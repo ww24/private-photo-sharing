@@ -1,13 +1,13 @@
 /**
  * Twitter ID <-> screen_name
- * 
+ *
  */
 
 var ntwitter = require("ntwitter"),
     https = require("https"),
     url = require("url"),
     models = require("../models"),
-    config = require("../config.json");
+    config = require("config");
 
 var twitter = {};
 

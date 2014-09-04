@@ -25,10 +25,8 @@ var schema = new mongoose.Schema({
     required: true
   },
   viewers: [{
-    type: mongoose.Schema.Types.Mixed,
-    // migrate 実行後に 1 行上の type を削除し、以下のコメントアウトを解除する
-    // type: mongoose.Schema.Types.ObjectId,
-    // ref: "Twitter",
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Twitter",
     required: true
   }],
   exif: {

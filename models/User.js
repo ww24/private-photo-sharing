@@ -49,7 +49,7 @@ schema.pre("save", function (next) {
   var Twitter = mongoose.model("Twitter");
   Twitter.findOne({id: user.id}, function (err, twitter) {
     if (err) {
-      console.error();
+      console.error(err);
     }
 
     if (twitter === null) {

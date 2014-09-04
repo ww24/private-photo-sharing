@@ -25,7 +25,6 @@ router.get("/", function (req, res) {
 
 router.post("/", function (req, res) {
   var screen_name = req.body.screen_name;
-  console.log(screen_name);
 
   libs.twitter.screenNameToId({
     key: req.user.key,

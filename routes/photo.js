@@ -7,6 +7,7 @@ var express = require("express"),
     multer = require("multer"),
     mime = require("mime-magic"),
     im = require("imagemagick"),
+    async = require("async"),
     path = require("path"),
     fs = require("fs"),
     libs = require("../libs"),
@@ -192,10 +193,18 @@ router.post("/", function (req, res) {
     data.viewers = accounts;
 
     if (photo instanceof Array) {
-      photo.forEach(function (file, index) {
-        saveFile.call(req, file, function () {
-          ! index || res.json({status: "ok"});
-        });
+      async.parallel(photo.map(function (file) {
+        return saveFile.bind(req, file);
+      }), function (err) {
+        if (err) {
+          res.json({
+            status: "ng",
+            error: "save image error"
+          });
+          return console.error(err);
+        }
+
+        res.json({status: "ok"});
       });
     } else {
       saveFile.call(req, photo, function () {

@@ -15,16 +15,17 @@ Vue.config({
     },
     methods: {
       add: function () {
-        this.viewers.push({value: ""});
+        this.$data.viewers.push({value: ""});
       },
       remove: function (index) {
-        this.viewers.splice(index, 1);
+        this.$data.viewers.splice(index, 1);
       },
       submit: function (e) {
         e.preventDefault();
 
         var that = this;
-        this.error_message = "";
+        console.log(this.$data, this.$root.$data);
+        this.$data.error_message = "";
 
         var $e = $(e.target);
         var $button = $("button.submit-button").button("loading");
@@ -48,18 +49,18 @@ Vue.config({
             // close modal
             $(that.$el).modal("hide");
             // reset form
-            that.viewers = [{value: ""}];
+            that.$data.viewers = [{value: ""}];
             e.target.reset();
             that.$root.$broadcast("refresh");
           } else {
-            that.error_message = "server error";
+            that.$data.error_message = "server error";
           }
         }).fail(function (req) {
           console.error(req);
           if (req.status === 404) {
-            that.error_message = "screen name が見つかりません。";
+            that.$data.error_message = "screen name が見つかりません。";
           } else {
-            that.error_message = "network error";
+            that.$data.error_message = "network error";
           }
         }).always(function () {
           $button.button("reset");
@@ -92,11 +93,11 @@ Vue.config({
             $(that.$el).modal("hide");
             that.$root.$broadcast("refresh");
           } else {
-            that.error_message = "server error";
+            that.$data.error_message = "server error";
           }
         }).fail(function (req) {
           console.error(req);
-          that.error_message = "network error";
+          that.$data.error_message = "network error";
         }).always(function () {
           $delete.button("reset");
         });
@@ -149,6 +150,7 @@ Vue.config({
         root.photo_detail.viewers = root.photo_detail.viewers.map(function (viewer) {
           return {value: viewer.screen_name};
         });
+        root.photo_detail.error_message = "";
 
         $("#photo-detail-modal").modal("show");
       }
@@ -165,6 +167,9 @@ Vue.config({
     methods: {
       stopEvent: function (e) {
         e.stopPropagation();
+      },
+      cancelEvent: function (e) {
+        e.preventDefault();
       }
     }
   });

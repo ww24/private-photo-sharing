@@ -13,30 +13,46 @@ var express = require("express"),
     models = require("../models");
 
 router.get("/", function (req, res) {
+  // 投稿者が自分の写真を取得
   models.Photo.find({contributor: req.user})
+  .populate("viewers")
   .sort({created_at: -1})
   .exec(function (err, my_photos) {
     if (err) {
-      return res.status(500).json({
+      res.status(500).json({
         status: "ng",
         error: "DB error"
       });
+      return console.error(err);
     }
 
-    models.Photo.find({viewers: req.user.id})
-    .sort({created_at: -1})
-    .populate("contributor")
-    .exec(function (err, photos) {
+    // User model -> Twitter model
+    models.Twitter.findOne({id: req.user.id}, function (err, account) {
       if (err) {
-        return res.status(500).json({
+        res.status(500).json({
           status: "ng",
           error: "DB error"
         });
+        return console.error(err);
       }
 
-      res.json({
-        my_photos: my_photos,
-        photos: photos
+      // 自分に共有されている写真を取得
+      models.Photo.find({viewers: account})
+      .populate("contributor")
+      .sort({created_at: -1})
+      .exec(function (err, photos) {
+        if (err) {
+          res.status(500).json({
+            status: "ng",
+            error: "DB error"
+          });
+          return console.error(err);
+        }
+
+        res.json({
+          my_photos: my_photos,
+          photos: photos
+        });
       });
     });
   });
@@ -142,21 +158,29 @@ router.post("/", function (req, res) {
   var photo = req.files.photo;
   var data = req.body;
 
-  if (! photo) {
+  if (! photo || ! data.viewers) {
     return res.status(400).json({
       status: "ng",
       error: "Bad Request"
     });
   }
 
+  // cast to Array
   if (! (data.viewers instanceof Array)) {
     data.viewers = [data.viewers];
+  }
+
+  if (data.viewers.length === 0) {
+    return res.status(400).json({
+      status: "ng",
+      error: "Bad Request"
+    });
   }
 
   libs.twitter.screenNameToId({
     key: req.user.key,
     secret: req.user.secret
-  }, data.viewers, function (err, ids) {
+  }, data.viewers, function (err, accounts) {
     if (err) {
       res.status(err.statusCode).json({
         status: "ng",
@@ -165,7 +189,7 @@ router.post("/", function (req, res) {
       return console.error(err);
     }
 
-    data.viewers = ids;
+    data.viewers = accounts;
 
     if (photo instanceof Array) {
       photo.forEach(function (file, index) {
@@ -184,6 +208,7 @@ router.post("/", function (req, res) {
 // update photo data
 router.put("/:id", function (req, res) {
   var data = req.body;
+
   if (! data.name && ! data.viewers) {
     return res.status(400).json({
       status: "ng",
@@ -191,14 +216,22 @@ router.put("/:id", function (req, res) {
     });
   }
 
+  // cast to Array
   if (! (data.viewers instanceof Array)) {
     data.viewers = [data.viewers];
+  }
+
+  if (data.viewers.length === 0) {
+    return res.status(400).json({
+      status: "ng",
+      error: "Bad Request"
+    });
   }
 
   libs.twitter.screenNameToId({
     key: req.user.key,
     secret: req.user.secret
-  }, data.viewers, function (err, ids) {
+  }, data.viewers, function (err, accounts) {
     if (err) {
       res.status(err.statusCode).json({
         status: "ng",
@@ -207,7 +240,7 @@ router.put("/:id", function (req, res) {
       return console.error(err);
     }
 
-    data.viewers = ids;
+    data.viewers = accounts;
 
     models.Photo.findOne({id: req.params.id}).populate("contributor").exec(function (err, photo) {
       if (req.user.id !== photo.contributor.id) {
@@ -217,6 +250,7 @@ router.put("/:id", function (req, res) {
         });
       }
 
+      // update photo data
       data.name && (photo.name = data.name);
       data.viewers && (photo.viewers = data.viewers);
       photo.save(function (err) {

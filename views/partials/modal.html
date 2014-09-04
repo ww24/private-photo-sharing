@@ -116,7 +116,7 @@
               Tips
             </div>
             <div class="panel-body">
-              共有ユーザの項目、 id から screen name への変換が未実装なので、もうしばらくお待ち下さい。それ以外の機能は使えます。
+              写真は一度に 10MB 以下であれば何枚でも投稿できます。何度も screen name を入力する手間が省けるので便利です。
             </div>
           </div>
           <button v-on="click: open" class="btn btn-default" type="button">
@@ -131,7 +131,7 @@
         <button v-on="click: delete" v-show="checkPermission()" id="add-photo-modal-delete" class="btn btn-danger" type="button" data-loading-text="Deleting...">
           <span class="glyphicon glyphicon-trash"></span> Delete
         </button>
-        <button v-show="checkPermission()" id="add-photo-modal-submit" class="btn btn-primary submit-button" type="submit" data-loading-text="Updating..." disabled>
+        <button v-show="checkPermission()" id="add-photo-modal-submit" class="btn btn-primary submit-button" type="submit" data-loading-text="Updating...">
           <span class="glyphicon glyphicon-circle-arrow-up"></span> Update
         </button>
         <button class="btn btn-default" type="button" data-dismiss="modal">

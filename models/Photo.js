@@ -20,13 +20,17 @@ var schema = new mongoose.Schema({
     required: true
   },
   contributor: {
-    type: mongoose.Schema.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true
   },
-  viewers: {
-    type: [Number]
-  },
+  viewers: [{
+    type: mongoose.Schema.Types.Mixed,
+    // migrate 実行後に 1 行上の type を削除し、以下のコメントアウトを解除する
+    // type: mongoose.Schema.Types.ObjectId,
+    // ref: "Twitter",
+    required: true
+  }],
   exif: {
     type: Object
   },

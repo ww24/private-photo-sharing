@@ -32,109 +32,86 @@ twitter.idToScreenName = function (id, callback) {
   }).end();
 };
 
-function screen_name_map(screen_name) {
-  return {screen_name: screen_name};
-}
-
-// screen_name(s) -> id(s)
+// screen_name(s) -> id(s) (Twitter model object {_id, id, screen_name})
 twitter.screenNameToId = function (access_token, screen_names, callback) {
-  var ids = [];
+  var users = [];
 
   // screen_names が 0 件なら空の結果を返す
   if (screen_names.length === 0) {
-    return callback && callback(ids);
+    return callback && callback(users);
   }
 
-  // callback を呼ぶためのチェック
-  function check(users) {
-    // screen_names と ids の更新
-    [].push.apply(ids, users.map(function (user) {
-      // remove screen_name in screen_names
-      var index = screen_names.indexOf(user.screen_name);
-      screen_names.splice(index, 1);
-      return user.id;
-    }));
-
-    // screen_names が空なら抜け出す
-    if (screen_names.length === 0) {
-      return true;
-    }
-  }
-
-  // ユーザ情報からの検索
-  var query = models.User.find();
-  query.or(screen_names.map(screen_name_map));
-  query.exec(function (err, users) {
+  // キャッシュからの検索
+  var query = models.Twitter.find();
+  query.or(screen_names.map(function (screen_name) {
+    return {screen_name: screen_name};
+  }));
+  query.exec(function (err, accounts) {
     if (err) {
       return callback && callback(err);
     }
 
-    if (check(users)) {
-      return callback && callback(null, ids);
+    // screen_names と users の更新
+    [].push.apply(users, accounts.map(function (account) {
+      // remove screen_name in screen_names
+      var index = screen_names.indexOf(account.screen_name);
+      screen_names.splice(index, 1);
+      return account;
+    }));
+
+    // screen_names が空なら抜け出す
+    if (screen_names.length === 0) {
+      return callback && callback(null, users);
     }
 
-    // キャッシュからの検索
-    var query = models.Twitter.find();
-    query.or(screen_names.map(screen_name_map));
-    query.exec(function (err, users) {
-      if (err) {
-        return callback && callback(err);
-      }
-
-      if (check(users)) {
-        return callback && callback(null, ids);
-      }
-
-      var tw = new ntwitter({
-        consumer_key: config.twitter.consumerKey,
-        consumer_secret: config.twitter.consumerSecret,
-        access_token_key: access_token.key,
-        access_token_secret: access_token.secret
-      });
-
-      // Twitter API 呼び出し
-      if (screen_names.length === 1) {
-        // 1 ユーザ検索
-        // https://dev.twitter.com/docs/api/1.1/get/users/show
-        tw.get("/users/show.json", {
-          screen_name: screen_names[0]
-        }, function (err, data) {
-          if (err) {
-            return callback && callback(err);
-          }
-
-          models.Twitter.create(data, function (err) {
-            if (err) {
-              return callback && callback(err);
-            }
-
-            ids.push(data.id);
-            callback && callback(null, ids);
-          });
-        });
-      } else {
-        // 複数ユーザ検索
-        // https://dev.twitter.com/docs/api/1.1/get/users/lookup
-        tw.get("/users/lookup.json", {
-          screen_name: screen_names.join(",")
-        }, function (err, data) {
-          if (err) {
-            return callback && callback(err);
-          }
-
-          models.Twitter.create(data, function (err) {
-            if (err) {
-              return callback && callback(err);
-            }
-
-            [].push.apply(ids, data.map(function (d) {
-              return d.id;
-            }));
-            callback && callback(null, ids);
-          });
-        });
-      }
+    // twitter access token settings
+    var tw = new ntwitter({
+      consumer_key: config.twitter.consumerKey,
+      consumer_secret: config.twitter.consumerSecret,
+      access_token_key: access_token.key,
+      access_token_secret: access_token.secret
     });
+
+    // Twitter API 呼び出し
+    if (screen_names.length === 1) {
+      // 1 ユーザ検索
+      // https://dev.twitter.com/docs/api/1.1/get/users/show
+      tw.get("/users/show.json", {
+        screen_name: screen_names[0]
+      }, function (err, data) {
+        if (err) {
+          return callback && callback(err);
+        }
+
+        models.Twitter.create(data, function (err, account) {
+          if (err) {
+            return callback && callback(err);
+          }
+
+          users.push(account);
+          callback && callback(null, users);
+        });
+      });
+    } else {
+      // 複数ユーザ検索
+      // https://dev.twitter.com/docs/api/1.1/get/users/lookup
+      tw.get("/users/lookup.json", {
+        screen_name: screen_names.join(",")
+      }, function (err, data) {
+        if (err) {
+          return callback && callback(err);
+        }
+
+        models.Twitter.create(data, function (err, accounts) {
+          if (err) {
+            return callback && callback(err);
+          }
+
+          [].push.apply(users, accounts);
+          callback && callback(null, users);
+        });
+      });
+    }
   });
 };
 

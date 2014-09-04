@@ -146,8 +146,8 @@ Vue.config({
         // send data for photo-detail-modal
         var root = this.$root.$data;
         root.photo_detail = JSON.parse(JSON.stringify(photo));
-        root.photo_detail.viewers = root.photo_detail.viewers.map(function (value) {
-          return {value: value};
+        root.photo_detail.viewers = root.photo_detail.viewers.map(function (viewer) {
+          return {value: viewer.screen_name};
         });
 
         $("#photo-detail-modal").modal("show");

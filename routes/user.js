@@ -29,7 +29,7 @@ router.post("/", function (req, res) {
   libs.twitter.screenNameToId({
     key: req.user.key,
     secret: req.user.secret
-  }, [screen_name], function (err, ids) {
+  }, [screen_name], function (err, accounts) {
     if (err) {
       res.status(err.statusCode).json({
         status: "ng",
@@ -39,7 +39,7 @@ router.post("/", function (req, res) {
     }
 
     models.User.create({
-      id: ids[0],
+      id: accounts[0].id,
       screen_name: screen_name,
       name: "未認証"
     }, function (err) {

@@ -117,7 +117,10 @@ app.use(function(err, req, res, next) {
   });
 });
 
-// start server
-var server = app.listen(app.get("port"), function() {
-  console.log("Express server listening on port " + server.address().port);
+// start server (late start)
+// mongodb とのコネクションが確立される前に起動すると問題がある為
+setImmediate(function () {
+  var server = app.listen(app.get("port"), function() {
+    console.log("Express server listening on port " + server.address().port);
+  });
 });

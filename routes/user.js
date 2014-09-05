@@ -31,16 +31,16 @@ router.post("/", function (req, res) {
     secret: req.user.secret
   }, [screen_name], function (err, accounts) {
     if (err) {
-      res.status(err.statusCode).json({
+      res.status(err.statusCode || 500).json({
         status: "ng",
-        error: "twitter access error"
+        error: err.statusCode ? "twitter access error" : "DB error"
       });
       return console.error(err);
     }
 
     models.User.create({
       id: accounts[0].id,
-      screen_name: screen_name,
+      screen_name: accounts[0].screen_name,
       name: "未認証"
     }, function (err) {
       if (err) {

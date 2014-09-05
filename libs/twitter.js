@@ -4,6 +4,7 @@
  */
 
 var ntwitter = require("ntwitter"),
+    async = require("async"),
     https = require("https"),
     url = require("url"),
     models = require("../models"),
@@ -83,13 +84,25 @@ twitter.screenNameToId = function (access_token, screen_names, callback) {
           return callback && callback(err);
         }
 
-        models.Twitter.create(data, function (err, account) {
+        models.Twitter.findOne({id: data.id}, function (err, account) {
           if (err) {
             return callback && callback(err);
           }
 
-          users.push(account);
-          callback && callback(null, users);
+          if (account === null) {
+            account = new models.Twitter();
+          }
+
+          account.id = data.id;
+          account.screen_name = data.screen_name;
+          account.save(function (err, account) {
+            if (err) {
+              return callback && callback(err);
+            }
+
+            users.push(account);
+            callback && callback(null, users);
+          });
         });
       });
     } else {
@@ -102,13 +115,49 @@ twitter.screenNameToId = function (access_token, screen_names, callback) {
           return callback && callback(err);
         }
 
-        models.Twitter.create(data, function (err, accounts) {
+        models.Twitter.find(data.map(function (d) {
+          return {id: d.id};
+        })).exec(function (err, accounts) {
           if (err) {
             return callback && callback(err);
           }
 
-          [].push.apply(users, accounts);
-          callback && callback(null, users);
+          var tasks = data.map(function (d) {
+            var index;
+            var existence = accounts.some(function (account, i) {
+              index = i;
+              return d.id === account.id;
+            });
+
+            var account;
+            if (existence) {
+              account = accounts[index];
+            } else {
+              account = new models.Twitter();
+            }
+
+            account.id = d.id;
+            account.screen_name = d.screen_name;
+
+            return function (done) {
+              account.save(function (err, account) {
+                if (err) {
+                  return done(err);
+                }
+
+                users.push(account);
+                done(null);
+              });
+            };
+          });
+
+          async.parallel(tasks, function (err) {
+            if (err) {
+              return callback && callback(err);
+            }
+
+            callback && callback(null, users);
+          });
         });
       });
     }

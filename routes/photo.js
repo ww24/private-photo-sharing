@@ -183,9 +183,9 @@ router.post("/", function (req, res) {
     secret: req.user.secret
   }, data.viewers, function (err, accounts) {
     if (err) {
-      res.status(err.statusCode).json({
+      res.status(err.statusCode || 500).json({
         status: "ng",
-        error: "twitter access error"
+        error: err.statusCode ? "twitter access error" : "DB error"
       });
       return console.error(err);
     }
@@ -242,9 +242,9 @@ router.put("/:id", function (req, res) {
     secret: req.user.secret
   }, data.viewers, function (err, accounts) {
     if (err) {
-      res.status(err.statusCode).json({
+      res.status(err.statusCode || 500).json({
         status: "ng",
-        error: "twitter access error"
+        error: err.statusCode ? "twitter access error" : "DB error"
       });
       return console.error(err);
     }

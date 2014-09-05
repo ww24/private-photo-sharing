@@ -23,7 +23,7 @@
                 <span class="input-group-addon">@</span>
                 <input class="form-control" type="text" name="viewers" value="[[value]]" required>
                 <span class="input-group-btn">
-                  <button v-on="click: remove($index)" v-show="$index > 0" class="btn btn-default" type="button">
+                  <button v-on="click: remove($index)" v-show="viewers.length > 1" class="btn btn-default" type="button">
                     <span class="glyphicon glyphicon-minus"></span>
                   </button>
                   <button v-on="click: add" class="btn btn-default" type="button">
@@ -98,7 +98,7 @@
                 <span class="input-group-addon">@</span>
                 <input class="form-control" type="text" name="viewers" value="[[value]]" required>
                 <span class="input-group-btn">
-                  <button v-on="click: remove($index)" v-show="$index > 0" class="btn btn-default" type="button">
+                  <button v-on="click: remove($index)" v-show="viewers.length > 1" class="btn btn-default" type="button">
                     <span class="glyphicon glyphicon-minus"></span>
                   </button>
                   <button v-on="click: add" class="btn btn-default" type="button">

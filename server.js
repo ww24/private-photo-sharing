@@ -122,7 +122,7 @@ app.use(function(err, req, res, next) {
 // mongodb とのコネクションが確立される前に起動すると問題がある為
 setImmediate(function listen() {
   var server = app.listen(app.get("port"), function() {
-    console.log("Express server listening on " + server.address());
+    console.log("Express server listening on " + JSON.stringify(server.address()));
   });
   server.on("error", function (err) {
     if (err.code === "EADDRINUSE") {

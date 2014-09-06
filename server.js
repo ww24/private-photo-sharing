@@ -12,6 +12,7 @@ var express = require("express"),
     hogan = require("hogan-express"),
     passport = require("passport"),
     path = require("path"),
+    fs = require("fs"),
     routes = require("./routes"),
     config = require("config");
 
@@ -119,8 +120,30 @@ app.use(function(err, req, res, next) {
 
 // start server (late start)
 // mongodb とのコネクションが確立される前に起動すると問題がある為
-setImmediate(function () {
+setImmediate(function listen() {
   var server = app.listen(app.get("port"), function() {
-    console.log("Express server listening on port " + server.address().port);
+    console.log("Express server listening on " + server.address());
+  });
+  server.on("error", function (err) {
+    if (err.code === "EADDRINUSE") {
+      console.log(err.code);
+      // cleanup に成功したら再度 listen を呼ぶ
+      cleanup() && listen();
+    }
   });
 });
+// お片付け (unix domain socket の一時ファイル削除)
+function cleanup() {
+  var sock = app.get("port");
+  // sock が数字 (ポート番号) であれば抜ける
+  if (! isNaN(sock)) {
+    return false;
+  }
+  // sock が存在したら削除
+  if (fs.existsSync(sock)) {
+    fs.unlinkSync(sock);
+    return true;
+  }
+  return false;
+}
+process.on("SIGINT", cleanup);

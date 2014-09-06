@@ -68,7 +68,7 @@
 							<button v-on="click: refresh" class="btn btn-sm btn-default refresh">
 								<span class="glyphicon glyphicon-refresh"></span> Refresh
 							</button>
-							あなたが投稿した写真一覧
+							あなたが投稿した写真 ([[my_photos.length]]枚)
 						</p>
 						<div class="row">
 							<div v-repeat="my_photos" class="col-sm-6 col-md-4">
@@ -90,7 +90,7 @@
 							<button v-on="click: refresh" class="btn btn-sm btn-default refresh">
 								<span class="glyphicon glyphicon-refresh"></span> Refresh
 							</button>
-							他のユーザが投稿した写真一覧
+							他のユーザが投稿した写真 ([[photos.length]]枚)
 						</p>
 						<div class="row">
 							<div v-repeat="photos" class="col-sm-6 col-md-4">

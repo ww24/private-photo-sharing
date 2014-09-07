@@ -122,6 +122,11 @@ app.use(function(err, req, res, next) {
 // mongodb とのコネクションが確立される前に起動すると問題がある為
 setImmediate(function listen() {
   var server = app.listen(app.get("port"), function() {
+    // sock ファイルが存在したら chmod 666 で権限を変更
+    var sock = app.get("port");
+    if (isNaN(sock) && fs.existsSync(sock)) {
+        fs.chmodSync(sock, 0666);
+    }
     console.log("Express server listening on " + JSON.stringify(server.address()));
   });
   server.on("error", function (err) {
@@ -135,15 +140,12 @@ setImmediate(function listen() {
 // お片付け (unix domain socket の一時ファイル削除)
 function cleanup() {
   var sock = app.get("port");
-  // sock が数字 (ポート番号) であれば抜ける
-  if (! isNaN(sock)) {
-    return false;
+  // sock が数字 (ポート番号) でない & sock ファイルが存在したら削除
+  if (isNaN(sock) && fs.existsSync(sock)) {
+      fs.unlinkSync(sock);
+      return true;
   }
-  // sock が存在したら削除
-  if (fs.existsSync(sock)) {
-    fs.unlinkSync(sock);
-    return true;
-  }
+
   return false;
 }
 process.on("SIGINT", cleanup);

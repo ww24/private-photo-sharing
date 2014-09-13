@@ -3,6 +3,15 @@
  * Private Photo Sharing
  */
 
+// for IE9
+if (! window.console) {
+  var log = function () {};
+  var method_list = "log,info,warn,error,dir,trace,time,timeEnd,group,groupEnd,groupCollapsed";
+  method_list.split(",").forEach(function (method) {
+    window.console[method] = log;
+  });
+}
+
 Vue.config({
   delimiters: ["[", "]"]
 });

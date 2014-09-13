@@ -178,6 +178,11 @@ router.post("/", function (req, res) {
     });
   }
 
+  // remove duplicate element from viewers
+  data.viewers = data.viewers.filter(function (viewer, index, viewers) {
+    return viewers.indexOf(viewer) === index;
+  });
+
   libs.twitter.screenNameToId({
     key: req.user.key,
     secret: req.user.secret
@@ -236,6 +241,11 @@ router.put("/:id", function (req, res) {
       error: "Bad Request"
     });
   }
+
+  // remove duplicate element from viewers
+  data.viewers = data.viewers.filter(function (viewer, index, viewers) {
+    return viewers.indexOf(viewer) === index;
+  });
 
   libs.twitter.screenNameToId({
     key: req.user.key,

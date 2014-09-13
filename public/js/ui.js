@@ -66,11 +66,30 @@ Vue.config({
           }
         }).fail(function (req) {
           console.error(req);
-          if (req.status === 404) {
-            that.$data.error_message = "screen name が見つかりません。";
-          } else {
-            that.$data.error_message = "network error";
+          var res = {};
+
+          try {
+            res = JSON.parse(req.responseText);
+          } catch (e) {
+            console.error(e);
           }
+
+          var error_message = "network error";
+          switch (req.status) {
+            case 404:
+              error_message = "screen name が見つかりません。";
+              break;
+            case 400:
+              if (res.error === "invalid mime type") {
+                error_message = "不正なファイル形式です。写真には正しい JPEG ファイルを選択して下さい。";
+              }
+              break;
+            case 500:
+              error_message = "server error";
+              break;
+          }
+
+          that.$data.error_message = error_message;
         }).always(function () {
           $button.button("reset");
         });

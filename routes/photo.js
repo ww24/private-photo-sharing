@@ -83,7 +83,8 @@ function unlinkFile(filename) {
 }
 // 写真の保存
 function saveFile(file, callback) {
-  var req = this;
+  var req = this,
+      error = null;
 
   libs.genid(function (err, id) {
     // id の存在確認
@@ -108,7 +109,9 @@ function saveFile(file, callback) {
         // JPEG 以外の場合はエラー
         if (type !== "image/jpeg") {
           unlinkFile(file.path);
-          return callback(new Error("invalid mime type"));
+          error = new Error("invalid mime type");
+          error.statusCode = 400;
+          return callback(error);
         }
 
         // EXIF Data の取得
@@ -127,25 +130,26 @@ function saveFile(file, callback) {
             exif: metadata && metadata.exif
           }, function (err) {
             if (err) {
-              console.error(err);
-            }
-          });
-
-          // thumbnail の生成
-          im.resize({
-            srcPath: file.path,
-            dstPath: path.join(thumbs_dir, id + ".jpg"),
-            quality: 0.8,
-            format: "jpg",
-            progressive: true,
-            width: 480
-          }, function (err, stdout, stderr) {
-            if (err) {
-              console.error(err, stderr);
+              return callback(err);
             }
 
-            // photo dir へ移動
-            fs.rename(file.path, path.join(photo_dir, id + ".jpg"), callback);
+            // thumbnail の生成
+            im.resize({
+              srcPath: file.path,
+              dstPath: path.join(thumbs_dir, id + ".jpg"),
+              quality: 0.8,
+              format: "jpg",
+              progressive: true,
+              width: 480
+            }, function (err, stdout, stderr) {
+              if (err) {
+                console.error(stderr);
+                return callback(err);
+              }
+
+              // photo dir へ移動
+              fs.rename(file.path, path.join(photo_dir, id + ".jpg"), callback);
+            });
           });
         });
       });
@@ -156,10 +160,10 @@ function saveFile(file, callback) {
 // upload photo (multiple)
 router.post("/", multer({dest: temp_dir}));
 router.post("/", function (req, res) {
-  var photo = req.files.photo;
+  var photos = req.files.photo;
   var data = req.body;
 
-  if (! photo || ! data.viewers) {
+  if (! photos || ! data.viewers) {
     return res.status(400).json({
       status: "ng",
       error: "Bad Request"
@@ -169,6 +173,11 @@ router.post("/", function (req, res) {
   // cast to Array
   if (! (data.viewers instanceof Array)) {
     data.viewers = [data.viewers];
+  }
+
+  // cast to Array
+  if (! (photos instanceof Array)) {
+    photos = [photos];
   }
 
   if (data.viewers.length === 0) {
@@ -197,25 +206,23 @@ router.post("/", function (req, res) {
 
     data.viewers = accounts;
 
-    if (photo instanceof Array) {
-      async.parallel(photo.map(function (file) {
-        return saveFile.bind(req, file);
-      }), function (err) {
-        if (err) {
-          res.json({
-            status: "ng",
-            error: "save image error"
-          });
-          return console.error(err);
+    async.parallel(photos.map(function (file) {
+      return saveFile.bind(req, file);
+    }), function (err) {
+      if (err) {
+        var message = "save image error";
+        if (err.message === "invalid mime type") {
+          message = err.message;
         }
+        res.status(err.statusCode || 500).json({
+          status: "ng",
+          error: message
+        });
+        return console.error(err);
+      }
 
-        res.json({status: "ok"});
-      });
-    } else {
-      saveFile.call(req, photo, function () {
-        res.json({status: "ok"});
-      });
-    }
+      res.json({status: "ok"});
+    });
   });
 });
 

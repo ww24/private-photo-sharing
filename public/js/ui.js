@@ -147,7 +147,8 @@ Vue.config({
   Vue.component("photo-stream", Vue.extend({
     data: {
       my_photos: [],
-      photos: []
+      photos: [],
+      screen_names: []
     },
     ready: function () {
       var that = this;
@@ -160,6 +161,24 @@ Vue.config({
           that.$data.my_photos = data.my_photos;
           that.$data.photos = data.photos;
           $refresh.button("reset");
+
+          // 写真の共有元、共有先から screen_name 一覧の取得
+          // map
+          var screen_names = data.photos.map(function (photo) {
+            return photo.contributor.screen_name;
+          });
+          var viewers = data.my_photos.map(function (photo) {
+            return photo.viewers.map(function (viewer) {
+              return viewer.screen_name;
+            });
+          });
+          // flatten
+          screen_names = [].concat.apply(screen_names, viewers);
+          // unique
+          screen_names = screen_names.filter(function (screen_name, index, arr) {
+            return arr.indexOf(screen_name) === index;
+          });
+          that.$data.screen_names = screen_names;
         });
       });
 

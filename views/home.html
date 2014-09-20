@@ -37,6 +37,10 @@
 
 			<!-- content -->
 			<div v-component="photo-stream" class="container">
+				<datalist id="screen_names">
+					<option v-repeat="screen_names" value="[[$value]]"></option>
+				</datalist>
+
 				<div class="page-header no-bottom-border">
 					<div class="media">
 						{{#user}}

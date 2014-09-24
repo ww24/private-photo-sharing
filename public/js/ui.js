@@ -33,7 +33,6 @@ Vue.config({
         e.preventDefault();
 
         var that = this;
-        console.log(this.$data, this.$root.$data);
         this.$data.error_message = "";
 
         var $e = $(e.target);
@@ -50,7 +49,12 @@ Vue.config({
         if (options.method === "post") {
           options.processData = false;
           options.contentType = false;
-          options.data = new FormData(e.target);
+          var fd = new FormData(e.target);
+          var files = this.$root.$data.files;
+          files.forEach(function (file) {
+            fd.append("photo", file);
+          });
+          options.data = fd;
         }
 
         $.ajax(options).done(function (res) {
@@ -59,6 +63,7 @@ Vue.config({
             $(that.$el).modal("hide");
             // reset form
             that.$data.viewers = [{value: ""}];
+            that.$root.$data.files = [];
             e.target.reset();
             that.$root.$broadcast("refresh");
           } else {
@@ -209,7 +214,8 @@ Vue.config({
   new Vue({
     el: document.body,
     data: {
-      photo_detail: {}
+      photo_detail: {},
+      files: []
     },
     methods: {
       stopEvent: function (e) {
@@ -217,6 +223,34 @@ Vue.config({
       },
       cancelEvent: function (e) {
         e.preventDefault();
+      },
+      drop: function (e) {
+        e.preventDefault();
+
+        var files = [].slice.call(e.dataTransfer.files);
+        var file_count = files.length;
+        files = files.filter(function (file) {
+          return file.type === "image/jpeg";
+        });
+        if (file_count !== files.length) {
+          alert("JPEG 画像以外はアップロードできません。");
+        }
+        this.$data.files.push.apply(this.$data.files, files);
+
+        $("#droparea").removeClass("dragover");
+      },
+      dragenter: function (e) {
+        if ($(e.target).hasClass("droparea")) {
+          $("#add-photo-modal").modal("show");
+        } else {
+          $("#droparea").addClass("dragover");
+        }
+      },
+      dragleave: function () {
+        $("#droparea").removeClass("dragover");
+      },
+      removeFile: function (index) {
+        this.$data.files.splice(index, 1);
       }
     }
   });

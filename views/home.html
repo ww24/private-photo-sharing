@@ -3,7 +3,10 @@
 	<head>
 		{{> header}}
 	</head>
-	<body>
+	<body v-on="dragenter:dragenter">
+		<!-- drag and drop -->
+		<div v-on="drop:drop, dragenter:dragenter, dragover:cancelEvent, dragleave:dragleave" id="droparea" class="droparea"></div>
+
 		<div class="wrap">
 			<!-- Fixed navbar -->
 			<header class="navbar navbar-default navbar-fixed-top">

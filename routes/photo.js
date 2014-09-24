@@ -180,6 +180,19 @@ router.post("/", function (req, res) {
     photos = [photos];
   }
 
+  // override filename
+  if (data.filename != null) {
+    // cast to Array
+    if (! (data.filename instanceof Array)) {
+      data.filename = [data.filename];
+    }
+
+    photos = photos.map(function (photo, index) {
+      photo.originalname = data.filename[index];
+      return photo;
+    });
+  }
+
   if (data.viewers.length === 0) {
     return res.status(400).json({
       status: "ng",

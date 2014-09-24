@@ -81,13 +81,16 @@ Vue.config({
 
           var error_message = "network error";
           switch (req.status) {
-            case 404:
-              error_message = "screen name が見つかりません。";
-              break;
             case 400:
               if (res.error === "invalid mime type") {
                 error_message = "不正なファイル形式です。写真には正しい JPEG ファイルを選択して下さい。";
               }
+              break;
+            case 404:
+              error_message = "screen name が見つかりません。";
+              break;
+            case 413:
+              error_message = "一度にアップロードできるファイルサイズを超えています。";
               break;
             case 500:
               error_message = "server error";

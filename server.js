@@ -19,6 +19,7 @@ var express = require("express"),
 var app = express();
 
 // express settings
+app.disable("x-powered-by");
 app.set("port", process.env.PORT || config.server.port || 3000);
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "html");
@@ -66,26 +67,7 @@ app.use(function (req, res, next) {
 });
 
 // load routes
-routes.call(app);
-
-// catch 404
-app.use(function(req, res) {
-  console.error(404, req.url);
-  res.send("Not Found", 404);
-});
-
-// catch csrf token error
-app.use(function (err, req, res, next) {
-  if (err.code !== "EBADCSRFTOKEN") {
-    return next(err);
-  }
-
-  // handle CSRF token errors here
-  res.status(403);
-  res.send("session has expired or form tampered with");
-});
-
-// error handlers
+app.use(routes);
 
 // development error handler
 // will print stacktrace

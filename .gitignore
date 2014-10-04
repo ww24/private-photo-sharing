@@ -17,4 +17,5 @@ db/*
 !db/mongod.conf
 
 # Settings
-config/production.yml
+config/*
+!config/default.yml

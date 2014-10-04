@@ -68,7 +68,7 @@
 
 <!-- photo detail view -->
 <div v-component="photo-detail-modal" v-with="photo_detail" id="photo-detail-modal" class="modal fade" tabindex="-1" role="dialog" aria-labbeldby="photoDatail" aria-hidden="true">
-  <div class="modal-dialog">
+  <div v-if="id != null" class="modal-dialog">
     <form v-on="submit: submit" class="modal-content" action="/photo/[[id]]?_csrf={{_csrf}}" method="put" role="form">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>

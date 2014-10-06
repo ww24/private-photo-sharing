@@ -13,13 +13,13 @@
           <img v-attr="src: '/photos/'+id+'.jpg'" alt="photo">
         </div>
         <div class="form-horizontal">
-          <div v-if="exif" class="form-group">
+          <div v-if="exif.dateTimeOriginal" class="form-group">
             <label class="col-xs-3 control-label">撮影日時</label>
             <div class="col-xs-9">
               <p>[[exif.dateTimeOriginal | dateFormat]]</p>
             </div>
           </div>
-          <div v-if="exif" class="form-group">
+          <div v-if="exif.make" class="form-group">
             <label class="col-xs-3 control-label">カメラ</label>
             <div class="col-xs-9">
               <p>[[exif.make]] [[exif.model]]</p>

@@ -1,72 +1,4 @@
-<!-- add Phone Number dialog -->
-<div v-component="add-photo-modal" id="add-photo-modal" class="modal fade" tabindex="-1" role="dialog" aria-labbeldby="addPhoto" aria-hidden="true">
-  <div class="modal-dialog">
-    <form v-on="submit: submit" class="modal-content" action="/photo?_csrf={{_csrf}}" method="post" enctype="multipart/form-data" role="form">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title">
-          <span class="glyphicon glyphicon-plus"></span> Add your photo(s)
-        </h4>
-      </div>
-      <div class="modal-body">
-        <div class="form-horizontal">
-          <div class="form-group">
-            <label class="col-xs-3 control-label">写真</label>
-            <div v-if="files.length === 0" class="col-xs-9">
-              <input id="file" class="form-control" type="file" name="photo" accept="image/jpeg" multiple required>
-            </div>
-            <div v-if="files.length > 0" class="col-xs-9">
-              <div v-repeat="files" class="input-group">
-                <input class="form-control" type="text" name="filename" value="[[name]]" required>
-                <span class="input-group-btn">
-                  <button v-on="click: removeFile($index)" class="btn btn-default" type="button">
-                    <span class="glyphicon glyphicon-minus"></span>
-                  </button>
-                </span>
-              </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-xs-3 control-label">共有ユーザ</label>
-            <div class="col-xs-9">
-              <div v-repeat="viewers" class="input-group">
-                <span class="input-group-addon">@</span>
-                <input class="form-control" type="text" name="viewers" value="[[value]]" list="screen_names" required>
-                <span class="input-group-btn">
-                  <button v-on="click: remove($index)" v-show="viewers.length > 1" class="btn btn-default" type="button">
-                    <span class="glyphicon glyphicon-minus"></span>
-                  </button>
-                  <button v-on="click: add" class="btn btn-default" type="button">
-                    <span class="glyphicon glyphicon-plus"></span>
-                  </button>
-                </span>
-              </div>
-            </div>
-          </div>
-          <div v-show="error_message.length > 0" class="alert alert-danger">
-            [[error_message]]
-          </div>
-          <div class="panel panel-info">
-            <div class="panel-heading">
-              Tips
-            </div>
-            <div class="panel-body">
-              共有ユーザには Twitter の screen name を指定してください。共有ユーザ以外には公開されません。<br>
-              共有ユーザに指定した場合でも、ログイン権限が無いと閲覧できません。<br>
-              他のユーザにログイン権限を与えたい場合は <a href="https://twitter.com/ww24">@ww24</a> までお問い合わせください。
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button class="btn btn-primary submit-button" data-loading-text="Saving..." type="submit">Add</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- photo detail view -->
+<!-- photo detail modal -->
 <div v-component="photo-detail-modal" v-with="photo_detail" id="photo-detail-modal" class="modal fade" tabindex="-1" role="dialog" aria-labbeldby="photoDatail" aria-hidden="true">
   <div v-if="id != null" class="modal-dialog">
     <form v-on="submit: submit" class="modal-content" action="/photo/[[id]]?_csrf={{_csrf}}" method="put" role="form">
@@ -147,6 +79,74 @@
         <button class="btn btn-default" type="button" data-dismiss="modal">
           <span class="glyphicon glyphicon-remove"></span> Close
         </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- add photo modal -->
+<div v-component="add-photo-modal" id="add-photo-modal" class="modal fade" tabindex="-1" role="dialog" aria-labbeldby="addPhoto" aria-hidden="true">
+  <div class="modal-dialog">
+    <form v-on="submit: submit" class="modal-content" action="/photo?_csrf={{_csrf}}" method="post" enctype="multipart/form-data" role="form">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">
+          <span class="glyphicon glyphicon-plus"></span> Add your photo(s)
+        </h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label class="col-xs-3 control-label">写真</label>
+            <div v-if="files.length === 0" class="col-xs-9">
+              <input id="file" class="form-control" type="file" name="photo" accept="image/jpeg" multiple required>
+            </div>
+            <div v-if="files.length > 0" class="col-xs-9">
+              <div v-repeat="files" class="input-group">
+                <input class="form-control" type="text" name="filename" value="[[name]]" required>
+                <span class="input-group-btn">
+                  <button v-on="click: removeFile($index)" class="btn btn-default" type="button">
+                    <span class="glyphicon glyphicon-minus"></span>
+                  </button>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-xs-3 control-label">共有ユーザ</label>
+            <div class="col-xs-9">
+              <div v-repeat="viewers" class="input-group">
+                <span class="input-group-addon">@</span>
+                <input class="form-control" type="text" name="viewers" value="[[value]]" list="screen_names" required>
+                <span class="input-group-btn">
+                  <button v-on="click: remove($index)" v-show="viewers.length > 1" class="btn btn-default" type="button">
+                    <span class="glyphicon glyphicon-minus"></span>
+                  </button>
+                  <button v-on="click: add" class="btn btn-default" type="button">
+                    <span class="glyphicon glyphicon-plus"></span>
+                  </button>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div v-show="error_message.length > 0" class="alert alert-danger">
+            [[error_message]]
+          </div>
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              Tips
+            </div>
+            <div class="panel-body">
+              共有ユーザには Twitter の screen name を指定してください。共有ユーザ以外には公開されません。<br>
+              共有ユーザに指定した場合でも、ログイン権限が無いと閲覧できません。<br>
+              他のユーザにログイン権限を与えたい場合は <a href="https://twitter.com/ww24">@ww24</a> までお問い合わせください。
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary submit-button" data-loading-text="Saving..." type="submit">Add</button>
       </div>
     </form>
   </div>

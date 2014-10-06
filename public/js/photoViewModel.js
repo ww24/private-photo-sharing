@@ -134,6 +134,35 @@
         var data = this.$root.$data;
         return ! (data.photo_detail.contributor && data.photo_detail.contributor.id);
       }
+    },
+    filters: {
+      dateFormat: function (date_str) {
+        // "2014-01-01T12:05:30.000Z" => "2014/01/01 12:05:30"
+
+        if (! date_str) {
+          return "unknown";
+        }
+
+        var d = new Date(date_str);
+        // fix timezone
+        d.setTime(d.getTime() + d.getTimezoneOffset() * 60 * 1000);
+
+        function zeroPadding(num) {
+          num = String(num);
+          if (num.length > 1) {
+            return num;
+          }
+          return "0" + num;
+        }
+
+        // time format 2014/01/01 12:05:30
+        return [
+          // 2014/01/01
+          [d.getFullYear(), d.getMonth() + 1, d.getDate()].map(zeroPadding).join("/"),
+          // 12:05:30
+          [d.getHours(), d.getMinutes(), d.getSeconds()].map(zeroPadding).join(":")
+        ].join(" ");
+      }
     }
   });
 

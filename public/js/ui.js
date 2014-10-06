@@ -46,6 +46,7 @@ new Vue({
     },
     dragenter: function (e) {
       if ($(e.target).hasClass("droparea")) {
+        $("#photo-detail-modal").modal("hide");
         $("#add-photo-modal").modal("show");
       } else {
         $("#droparea").addClass("dragover");

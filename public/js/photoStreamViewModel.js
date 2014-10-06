@@ -48,11 +48,11 @@ Vue.component("photo-stream", Vue.extend({
       this.$emit("refresh");
     },
     open: function (type, index) {
-      var photo = this[type][index];
+      var photo = JSON.parse(JSON.stringify(this[type][index]));
 
       // send data for photo-detail-modal
       var root = this.$root.$data;
-      root.photo_detail = JSON.parse(JSON.stringify(photo));
+      root.photo_detail = photo;
       root.photo_detail.viewers = root.photo_detail.viewers.map(function (viewer) {
         return {value: viewer.screen_name};
       });

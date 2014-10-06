@@ -19,6 +19,12 @@
               <p>[[exif.dateTimeOriginal | dateFormat]]</p>
             </div>
           </div>
+          <div v-if="exif" class="form-group">
+            <label class="col-xs-3 control-label">カメラ</label>
+            <div class="col-xs-9">
+              <p>[[exif.make]] [[exif.model]]</p>
+            </div>
+          </div>
           <div v-if="! checkPermission()" class="form-group">
             <label class="col-xs-3 control-label">名前</label>
             <div class="col-xs-9">

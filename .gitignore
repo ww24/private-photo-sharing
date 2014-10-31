@@ -11,6 +11,7 @@ temp/*
 .*
 !.gitignore
 !.gitkeep
+!.editorconfig
 
 # MongoDB
 db/*

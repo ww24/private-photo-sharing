@@ -39,13 +39,28 @@ pm2 start processes.json
 
 How to use UNIX domain socket
 -----------------------------
-Set path at `config.port`.
+Set path at `config.server.port`.
 
 Ex.
 ```yml
 server:
   port: /tmp/pps.sock
 ```
+
+Limited mode
+------------
+デフォルトでは利用できるユーザが制限されています。
+
+設定ファイルの `config.admin` の項目を参照して下さい。
+
+```yml
+admin:
+  twitter: 75828566
+  limited: true
+```
+
+* `twitter` には管理者の twitter ID を設定します。 (screen_name とは別物です)
+* `limited` に `true` を指定すると、管理者が事前に `/user` から登録したユーザのみ利用できるようになります。 `false` を設定すると、誰でも利用できるようになります。
 
 License
 -------

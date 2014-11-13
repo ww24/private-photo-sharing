@@ -23,6 +23,7 @@ router.get("/", function (req, res) {
   });
 });
 
+// add user
 router.post("/", function (req, res) {
   var screen_name = req.body.screen_name;
 
@@ -56,12 +57,26 @@ router.post("/", function (req, res) {
   });
 });
 
+// update user
 router.put("/:id", function (req, res) {
-
+  // 未実装
 });
 
+// delete user
 router.delete("/:id", function (req, res) {
-
+  models.User.remove({
+    id: req.params.id
+  }).exec().then(function () {
+    // success
+    res.json({status: "ok"});
+  }, function (err) {
+    // error
+    res.json({
+      status: "ng",
+      error: "DB Error"
+    });
+    console.error(err);
+  });
 });
 
 module.exports = router;

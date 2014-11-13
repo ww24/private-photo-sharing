@@ -34,7 +34,8 @@ passport.use(new TwitterStrategy(config.twitter, function (key, secret, profile,
       return done(err);
     }
 
-    if (user.id !== config.admin.twitter && user_profile === null) {
+    // limited mode: 管理者が事前登録したユーザのみが利用できるモード
+    if (config.admin.limited && user.id !== config.admin.twitter && user_profile === null) {
       err = new Error("account-unavailable");
       err.status = 403;
       return done(err);

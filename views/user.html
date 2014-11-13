@@ -4,21 +4,78 @@
 		{{> header}}
 	</head>
 	<body>
-		<h1>User Manager</h1>
+		<div class="wrap">
+			<!-- Fixed navbar -->
+			<header class="navbar navbar-default navbar-fixed-top">
+				<div class="container">
+					<!-- menu -->
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<a class="navbar-brand" href="/home">Private Photo Sharing</a>
+					</div>
+					<div class="navbar-collapse collapse">
+						<ul class="nav navbar-nav navbar-right">
+							<li>
+								<a href="/home">
+									<span class="glyphicon glyphicon-home"></span>
+									Go back home
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</header>
 
-		<div>
-			{{#users}}
-			<div>
-				twitter: @{{screen_name}}<br>
-				twitter id: {{id}}
+			<!-- content -->
+			<div class="container">
+				<div class="page-header">
+					<h1>User Manager</h1>
+				</div>
+
+				<div class="panel panel-default">
+					<div class="panel-heading">Users</div>
+					<div class="panel-body">
+						<p><code>config.admin.limited = true</code> の場合に、利用できるユーザを管理するためのものです。</p>
+
+						<form id="add-user" class="input-group" method="post" action="/user?_csrf={{_csrf}}">
+							<span class="input-group-addon">@</span>
+							<input class="form-control" type="text" name="screen_name" placeholder="screen name" required>
+							<span class="input-group-btn">
+								<button class="btn btn-default" type="submit">Add</button>
+							</span>
+						</form>
+					</div>
+					<table id="users" class="table">
+						<thead>
+							<th>name</th>
+							<th>screen name</th>
+							<th>twitter id</th>
+							<th>delete</th>
+						</thead>
+						<tbody>
+							{{#users}}
+							<tr>
+								<td>{{name}}</td>
+								<td>@{{screen_name}}</td>
+								<td>{{id}}</td>
+								<td>
+									<button class="btn btn-danger btn-sm delete" data-id="{{id}}">
+										<span class="glyphicon glyphicon-remove"></span>
+									</button>
+								</td>
+							</tr>
+							{{/users}}
+						</tbody>
+					</table>
+				</div>
+
 			</div>
-			{{/users}}
-		</div>
 
-		<form id="add-user" method="post" action="/user?_csrf={{_csrf}}">
-			<input type="text" name="screen_name" placeholder="screen name" required>
-			<button type="submit">Add User</button>
-		</form>
+		</div>
 
 		{{> footer}}
 		<script src="/js/user.js"></script>

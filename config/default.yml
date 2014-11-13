@@ -24,3 +24,4 @@ twitter:
 
 admin:
   twitter: twitter id number for admin user (not screen name)
+  limited: true

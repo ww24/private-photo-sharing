@@ -14,48 +14,39 @@ var express = require("express"),
     models = require("../models");
 
 router.get("/", function (req, res) {
+  var photo_stream = {
+    my_photos: null,
+    photos: null
+  };
+
   // 投稿者が自分の写真を取得
   models.Photo.find({contributor: req.user})
   .populate("viewers")
   .sort({created_at: -1})
-  .exec(function (err, my_photos) {
-    if (err) {
-      res.status(500).json({
-        status: "ng",
-        error: "DB error"
-      });
-      return console.error(err);
-    }
-
+  .exec()
+  .then(function (my_photos) {
+    photo_stream.my_photos = my_photos;
     // User model -> Twitter model
-    models.Twitter.findOne({id: req.user.id}, function (err, account) {
-      if (err) {
-        res.status(500).json({
-          status: "ng",
-          error: "DB error"
-        });
-        return console.error(err);
-      }
-
-      // 自分に共有されている写真を取得
-      models.Photo.find({viewers: account})
-      .populate("contributor")
-      .sort({created_at: -1})
-      .exec(function (err, photos) {
-        if (err) {
-          res.status(500).json({
-            status: "ng",
-            error: "DB error"
-          });
-          return console.error(err);
-        }
-
-        res.json({
-          my_photos: my_photos,
-          photos: photos
-        });
-      });
+    return models.Twitter.findOne({id: req.user.id}).exec();
+  })
+  .then(function (account) {
+    // 自分に共有されている写真を取得
+    return models.Photo.find({viewers: account})
+    .populate("contributor")
+    .sort({created_at: -1})
+    .exec();
+  })
+  .then(function (photos) {
+    // success
+    photo_stream.photos = photos;
+    res.json(photo_stream);
+  }, function (err) {
+    // error
+    res.status(500).json({
+      status: "ng",
+      error: "DB error"
     });
+    console.error(err);
   });
 });
 
@@ -171,19 +162,19 @@ router.post("/", function (req, res) {
   }
 
   // cast to Array
-  if (! (data.viewers instanceof Array)) {
+  if (! Array.isArray(data.viewers)) {
     data.viewers = [data.viewers];
   }
 
   // cast to Array
-  if (! (photos instanceof Array)) {
+  if (! Array.isArray(photos)) {
     photos = [photos];
   }
 
   // override filename
   if (data.filename != null) {
     // cast to Array
-    if (! (data.filename instanceof Array)) {
+    if (! Array.isArray(data.filename)) {
       data.filename = [data.filename];
     }
 
@@ -251,7 +242,7 @@ router.put("/:id", function (req, res) {
   }
 
   // cast to Array
-  if (! (data.viewers instanceof Array)) {
+  if (! Array.isArray(data.viewers)) {
     data.viewers = [data.viewers];
   }
 
@@ -281,7 +272,12 @@ router.put("/:id", function (req, res) {
 
     data.viewers = accounts;
 
-    models.Photo.findOne({id: req.params.id}).populate("contributor").exec(function (err, photo) {
+    models.Photo.findOne({id: req.params.id})
+    .populate("contributor")
+    .exec()
+    .then(function (photo) {
+      // success
+
       if (req.user.id !== photo.contributor.id) {
         return res.status(403).json({
           status: "ng",
@@ -296,7 +292,7 @@ router.put("/:id", function (req, res) {
         if (err) {
           res.status(500).json({
             status: "ng",
-            error: "remove error"
+            error: "update error"
           });
           return console.error(err);
         }
@@ -305,13 +301,26 @@ router.put("/:id", function (req, res) {
           status: "ok"
         });
       });
+    }, function (err) {
+      // error
+      res.status(500).json({
+        status: "ng",
+        error: "DB error"
+      });
+      console.error(err);
     });
   });
 });
 
 // delete photo
 router.delete("/:id", function (req, res) {
-  models.Photo.findOne({id: req.params.id}).populate("contributor").exec(function (err, photo) {
+  models.Photo.findOne({id: req.params.id})
+  .populate("contributor")
+  .exec()
+  .then(function (photo) {
+    // success
+
+    // id check
     if (req.user.id !== photo.contributor.id) {
       return res.status(403).json({
         status: "ng",
@@ -330,10 +339,18 @@ router.delete("/:id", function (req, res) {
 
       unlinkFile(path.join(photo_dir, req.params.id + ".jpg"));
       unlinkFile(path.join(thumbs_dir, req.params.id + ".jpg"));
+
       res.json({
         status: "ok"
       });
     });
+  }, function (err) {
+    // error
+    res.status(500).json({
+      status: "ng",
+      error: "DB error"
+    });
+    console.error(err);
   });
 });
 

@@ -132,7 +132,7 @@
       },
       checkPermission: function () {
         var data = this.$root.$data;
-        return ! (data.photo_detail.contributor && data.photo_detail.contributor.id);
+        return data.photo_detail.contributor && ! data.photo_detail.contributor.id;
       }
     },
     filters: {

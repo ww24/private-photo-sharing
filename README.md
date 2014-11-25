@@ -9,6 +9,7 @@ Requirements
 ------------
 * Node.js 0.10
 * MongoDB 2.6
+* ImageMagick
 * Nginx 1.4+ (option)
 
 Features

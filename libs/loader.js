@@ -12,6 +12,8 @@ function loader(dirpath) {
 
   fs.readdirSync(dirpath).forEach(function (file) {
     var module = path.basename(file, ".js");
+    var ext = path.extname(file);
+    if (ext !== ".js") return;
     if (module === "index") return;
 
     libs[module] = require(path.join(dirpath, module));

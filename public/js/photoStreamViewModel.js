@@ -23,7 +23,9 @@ Vue.component("photo-stream", Vue.extend({
 
         // 写真の共有元、共有先から screen_name 一覧の取得
         // map
-        var screen_names = data.photos.map(function (photo) {
+        var screen_names = data.photos.filter(function (photo) {
+          return photo.contributor !== null;
+        }).map(function (photo) {
           return photo.contributor.screen_name;
         });
         var viewers = data.my_photos.map(function (photo) {

@@ -131,3 +131,5 @@ function cleanup() {
   return false;
 }
 process.on("SIGINT", cleanup);
+
+module.exports = app;

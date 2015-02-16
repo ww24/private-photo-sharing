@@ -15,6 +15,7 @@ var express = require("express"),
 
 router.get("/", function (req, res) {
   var photo_stream = {
+    status: "ok",
     my_photos: null,
     photos: null
   };

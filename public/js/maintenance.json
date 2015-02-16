@@ -1,3 +1,4 @@
 {
-  "error": "Service is not available."
+  "status": "ng",
+  "error": "service is not available"
 }

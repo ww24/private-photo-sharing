@@ -2,19 +2,19 @@
  * Private Photo Sharing
  */
 
-var express = require("express"),
-    bodyParser = require("body-parser"),
-    session = require("express-session"),
-    csrf = require("csurf"),
-    morgan = require("morgan"),
-    MongoStore = require("connect-mongo")(session),
-    flash = require("connect-flash"),
-    hogan = require("hogan-express"),
-    passport = require("passport"),
-    path = require("path"),
-    fs = require("fs"),
-    routes = require("./routes"),
-    config = require("config");
+var express = require("express");
+var bodyParser = require("body-parser");
+var session = require("express-session");
+var csrf = require("csurf");
+var morgan = require("morgan");
+var MongoStore = require("connect-mongo")(session);
+var flash = require("connect-flash");
+var hogan = require("hogan-express");
+var passport = require("passport");
+var path = require("path");
+var fs = require("fs");
+var routes = require("./routes");
+var config = require("config");
 
 var app = express();
 
@@ -33,7 +33,9 @@ app.locals.partials = {
 // middleware
 app.use(express.static(path.resolve(__dirname, "public")));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 app.use(session({
   name: config.session.name,
   cookie: config.session.cookie,
@@ -44,7 +46,9 @@ app.use(session({
     port: config.db.port,
     username: config.db.user,
     password: config.db.pass
-  })
+  }),
+  resave: false,
+  saveUninitialized: true
 }));
 app.use(flash());
 app.use(csrf());
@@ -55,7 +59,7 @@ app.use(function (req, res, next) {
 
 // logger
 if (app.get("env") === "development") {
-  app.use(morgan());
+  app.use(morgan("combined"));
 }
 
 // passport settings
@@ -130,4 +134,7 @@ function cleanup() {
 
   return false;
 }
-process.on("SIGINT", cleanup);
+process.on("SIGINT", function () {
+  cleanup();
+  process.exit(0);
+});
